@@ -1,61 +1,55 @@
+import { App } from "./server";
+import cors from "cors";
+import express from "express";
 import supertest from "supertest";
-import crypto from "node:crypto";
-import app from "./server";
 
-const request = supertest(app);
+jest.mock("cors");
+jest.mock("./routes/short-url-1");
+express.json = jest.fn();
+
+const originalEnv = process.env;
+const app = new App();
+const request = supertest(app.express);
+app.express.use = jest.fn();
+app.express.listen = jest.fn();
+
 describe("server.ts", () => {
-  let randomBytes = {};
   beforeEach(() => {
-    randomBytes = {
-      toString: jest.fn().mockImplementation(() => "12345"),
-    };
-    jest.spyOn(crypto, "randomBytes").mockImplementation(() => randomBytes);
+    jest.resetModules();
+    app.start();
   });
 
-  describe("POST /shorten-url", () => {
-    test("return a new shorten url", async () => {
-      const response = await request.post("/shorten-url").send({ url: "http://test.com" });
-      expect(response.statusCode).toBe(200);
-      expect(response.body.shortUrl).toMatch(/http:\/\/localhost:4000\/[0-9a-zA-Z]/);
-      expect(crypto.randomBytes).toBeCalledTimes(1);
-      expect(randomBytes.toString).toBeCalledTimes(1);
-    });
-    test("throw an error if a url is not set up", async () => {
-      const response = await request.post("/shorten-url").send({});
-      expect(response.statusCode).toBe(404);
-      expect(response.text).toBe("url is necessary");
-      expect(crypto.randomBytes).toBeCalledTimes(0);
-    });
-    test("throw an error if a url does not have http or https", async () => {
-      const response = await request.post("/shorten-url").send({ url: "test.com" });
-      expect(response.statusCode).toBe(404);
-      expect(response.text).toBe("URL should start with 'http://' or 'https://'");
-      expect(crypto.randomBytes).toBeCalledTimes(0);
-    });
-    test("throw an error if a generated key is duplicated", async () => {
-      await request.post("/shorten-url").send({ url: "http://test.com" });
-      expect(crypto.randomBytes).toBeCalledTimes(1);
-      expect(randomBytes.toString).toBeCalledTimes(1);
-      const response = await request.post("/shorten-url").send({ url: "http://test.com" });
-      expect(response.statusCode).toBe(404);
-      expect(response.text).toBe("key is duplicated");
-      expect(crypto.randomBytes).toBeCalledTimes(2);
-      expect(randomBytes.toString).toBeCalledTimes(2);
-    });
+  afterEach(() => {
+    process.env = originalEnv;
   });
 
-  describe("POST /:id", () => {
-    test("redirect to the long url", async () => {
-      const url = "http://test.com";
-      await request.post("/shorten-url").send({ url });
-      const response = await request.get("/12345");
-      expect(response.statusCode).toBe(302);
-      expect(response.header.location).toBe(url);
+  describe("start()", () => {
+    test("use(cors()) is called", () => {
+      expect(cors).toBeCalledTimes(1);
     });
-    test("throw an error if the shor url has not been created yet", async () => {
-      const response = await request.get("/aaa");
+    test("use(express.json()) is called", () => {
+      expect(express.json).toBeCalledTimes(1);
+    });
+    test("route.methods() is called", () => {
+      app["routes"].map((route) => {
+        expect(route.methods).toBeCalledTimes(1);
+      });
+    });
+    test("use(errorHandler) is called", async () => {
+      const response = await request.get("/error");
       expect(response.statusCode).toBe(404);
-      expect(response.text).toBe("the short url is not corrct");
+    });
+    test("listen(port, fn) is called in production", () => {
+      process.env = {
+        ...originalEnv,
+        NODE_ENV: "production",
+      };
+      app.start();
+      expect(app.express.listen).toBeCalledTimes(1);
+      expect(app.express.listen).toHaveBeenCalledWith(4000, expect.anything());
+    });
+    test("listen(port, fn) is not called in testing", () => {
+      expect(app.express.listen).toBeCalledTimes(0);
     });
   });
 });
