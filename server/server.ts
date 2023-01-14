@@ -15,7 +15,7 @@ export interface IRoute {
 
 export class App implements IApp {
   express = express();
-  private static port = 4000;
+  private static port = process.env.PORT;
   private routes: IRoute[] = [new ShortURL()];
 
   start() {

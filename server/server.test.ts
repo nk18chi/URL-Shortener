@@ -46,7 +46,7 @@ describe("server.ts", () => {
       };
       app.start();
       expect(app.express.listen).toBeCalledTimes(1);
-      expect(app.express.listen).toHaveBeenCalledWith(4000, expect.anything());
+      expect(app.express.listen).toHaveBeenCalledWith(process.env.PORT, expect.anything());
     });
     test("listen(port, fn) is not called in testing", () => {
       expect(app.express.listen).toBeCalledTimes(0);

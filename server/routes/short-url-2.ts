@@ -7,7 +7,7 @@ export class ShortURL implements IRoute {
   private keys: string[] = [];
   private shortURLs: { [key: string]: string } = {}; // shorten URL => actual URL
   private keySet: Set<string> = new Set();
-  private static domain = `http://localhost:4000`;
+  private static domain = process.env.DOMAIN;
   private static keySize = 10;
 
   initialize() {
@@ -22,7 +22,7 @@ export class ShortURL implements IRoute {
   methods(express: Express) {
     this.initialize();
 
-    express.post("/shorten-url", (res, req, next) => {
+    express.post("/shorten-url", (res, req) => {
       const { url } = res.body || {};
       if (!url) throw new Error("url is necessary");
       if (!/^http(s){0,1}:\/\//.test(url)) throw new Error("URL should start with 'http://' or 'https://'");
