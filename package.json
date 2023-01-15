@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "lint-staged": "lint-staged",
+    "client:lint": "cd client && yarn run lint",
+    "server:lint": "cd server && yarn run lint"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3"
+  },
+  "dependencies": {
+    "lint-staged": "^13.1.0"
+  }
+}
