@@ -15,8 +15,12 @@ export interface IRoute {
 
 export class App implements IApp {
   express = express();
-  private static port = process.env.PORT;
-  private routes: IRoute[] = [new ShortURL()];
+  private static port: number;
+  private routes: IRoute[];
+  constructor() {
+    App.port = Number(process.env.PORT);
+    this.routes = [new ShortURL()];
+  }
 
   start() {
     this.express.use(cors());
@@ -24,6 +28,7 @@ export class App implements IApp {
 
     this.routes.map((route) => route.methods(this.express));
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const errorHandler: ErrorRequestHandler = (err, _, res, __) => {
       const status = err.status || 404;
       res.status(status).send(err.message);
