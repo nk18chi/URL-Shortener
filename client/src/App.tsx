@@ -44,7 +44,7 @@ const App = () => {
       if (!url) dispatch({ type: ActionTypes.setMessage, payload: { message: "Please set a URL" } });
       const res = await fetch("http://localhost:4000/shorten-url", {
         method: "POST",
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ longUrl: url }),
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
