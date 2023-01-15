@@ -1,6 +1,6 @@
-import React, { useReducer } from "react";
-import { createStyles, Alert, Flex, Container, Input, Button, Title, Text, Loader, Center } from "@mantine/core";
-import { IconBan, IconCheck } from "@tabler/icons";
+import React, { useEffect, useReducer, useState } from "react";
+import { createStyles, Alert, Flex, Container, Input, Button, Title, Text, Loader, Center, ActionIcon } from "@mantine/core";
+import { IconBan, IconCheck, IconCopy } from "@tabler/icons";
 
 import "./App.css";
 import { Dots } from "./Dots";
@@ -128,6 +128,7 @@ const useStyles = createStyles((theme) => ({
 
 const App = () => {
   const { classes } = useStyles();
+  const [showCopyIcon, setShowCopyIcon] = useState(false);
   const [{ url, shortUrl, message, loading }, dispatch] = useReducer(urlReducer, { loading: false, url: "", shortUrl: "", message: "" });
   const handleClick = () => {
     (async () => {
@@ -153,6 +154,13 @@ const App = () => {
       dispatch({ type: ActionTypes.setShortenUrl, payload: { shortUrl } });
     })();
   };
+
+  useEffect(() => {
+    if (!showCopyIcon) return;
+    const interval = setInterval(() => setShowCopyIcon(false), 2000);
+    return () => clearInterval(interval);
+  }, [showCopyIcon]);
+
   return (
     <Container className={classes.wrapper} size={1400}>
       <Dots className={classes.dots} style={{ left: 0, top: 0 }} />
@@ -198,6 +206,22 @@ const App = () => {
                       <a href={shortUrl} target='_blank' rel='noreferrer'>
                         {shortUrl}
                       </a>
+                      <ActionIcon
+                        onClick={() => {
+                          navigator.clipboard.writeText(shortUrl);
+                          setShowCopyIcon(true);
+                        }}
+                      >
+                        <IconCopy size={18} />
+                      </ActionIcon>
+                      {showCopyIcon && (
+                        <Flex gap={2} align='center' direction='row' wrap='nowrap'>
+                          <IconCheck color='green' size={16} />
+                          <Text color='dimmed' size='sm'>
+                            Copied!
+                          </Text>
+                        </Flex>
+                      )}
                     </Flex>
                   </Alert>
                 )}
