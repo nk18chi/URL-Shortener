@@ -4,11 +4,18 @@ import { IRoute } from "../server";
 
 // 2. Generate random keys BEFOREHAND and assign a key to a long url
 export class ShortURL implements IRoute {
-  private keys: string[] = [];
-  private shortURLs: { [key: string]: string } = {}; // short URL => long URL
-  private keySet: Set<string> = new Set();
-  private static domain = process.env.DOMAIN;
+  private keys: string[];
+  private shortURLs: { [key: string]: string }; // short URL => long URL
+  private keySet: Set<string>;
+  private static domain: string;
   private static keySize = 10;
+
+  constructor() {
+    this.keys = [];
+    this.shortURLs = {};
+    this.keySet = new Set();
+    ShortURL.domain = process.env.DOMAIN ? process.env.DOMAIN : "";
+  }
 
   initialize() {
     this.shortURLs = {};
