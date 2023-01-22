@@ -25,7 +25,9 @@
     "test": "react-scripts test --watchAll=false",
     "test:watch": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint --cache --fix --max-warnings=0"
+    "lint": "eslint --cache --fix --max-warnings=0",
+    "cypress": "cypress open",
+    "cypress:headless": "cypress run"
   },
   "eslintConfig": {
     "extends": [
@@ -47,6 +49,7 @@
   },
   "devDependencies": {
     "@tabler/icons": "^1.119.0",
+    "cypress": "^12.3.0",
     "eslint": "^8.32.0",
     "msw": "^0.49.3"
   }
