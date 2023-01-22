@@ -27,13 +27,12 @@ jobs:
         run: |
           cd client
           yarn test
-      # - name: Cypress Run
-      #   uses: cypress-io/github-action@v4
-      #   with:
-      #     working-directory: client
-      #     start: yarn run dev:test
-      #     wait-on: "http://localhost:3000"
-      #     config: screenshotOnRunFailure=false,video=false
+      - name: Cypress Run
+        uses: cypress-io/github-action@v4
+        with:
+          working-directory: client
+          start: yarn start
+          wait-on: "http://localhost:3000"
 
   server_testing:
     runs-on: ubuntu-latest
