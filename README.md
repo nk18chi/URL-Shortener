@@ -21,3 +21,7 @@
 ## Demo
 
 https://user-images.githubusercontent.com/42604585/213934878-4ace03df-87cf-445d-8c3d-ad961a4ad966.mov
+
+## Article
+
+https://dev.to/nk18chi/build-a-url-shortener-using-react-and-nodeexpress-in-typescript-3p68
